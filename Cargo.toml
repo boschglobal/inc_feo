@@ -2,6 +2,7 @@
 members = [
     "examples/rust/cycle-benchmark",
     "examples/rust/mini-adas",
+    "examples/rust/ascii_name",
     "feo",
     "feo-com",
     "feo-cpp-build",

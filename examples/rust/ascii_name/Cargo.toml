@@ -1,0 +1,24 @@
+[package]
+name = "ascii_name"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+feo = { workspace = true }
+feo-log = { workspace = true }
+feo-logger = { workspace = true }
+feo-time = { workspace = true }
+feo-tracing = { workspace = true }
+feo-com = { workspace = true }
+
+
+[features]
+com_iox2 = ["feo-com/ipc_iceoryx2"]
+com_linux_shm = ["feo-com/ipc_linux_shm"]
+default = ["com_iox2", "signalling_direct_mpsc"]
+signalling_direct_mpsc = []
+signalling_direct_tcp = []
+signalling_direct_unix = []
+signalling_relayed_tcp = []
+signalling_relayed_unix = []
