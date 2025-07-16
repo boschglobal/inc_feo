@@ -2,6 +2,7 @@
 name = "ascii_name"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 
 [dependencies]
@@ -11,7 +12,11 @@ feo-logger = { workspace = true }
 feo-time = { workspace = true }
 feo-tracing = { workspace = true }
 feo-com = { workspace = true }
+chrono = "0.4"
 
+[build-dependencies]
+vergen = { version = "9.0.0", features = ["build"] }
+anyhow = "1.0"
 
 [features]
 com_iox2 = ["feo-com/ipc_iceoryx2"]

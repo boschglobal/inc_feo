@@ -11,6 +11,8 @@ use ascii_name::config::{
     NUM_LINES
 };
 use std::collections::HashSet;
+use chrono::{DateTime, Local};
+
 
 const AGENT_ID: AgentId = AgentId::new(100);
 // Long cycle time (10 seconds) so that the ASCII art is visible for some time
@@ -24,6 +26,18 @@ fn main() {
     info!("Starting ASCII Name display with {} lines", NUM_LINES);
     info!("The ASCII art will refresh every {} seconds", params.feo_cycle_time.as_secs());
     info!("Each activity will print progressively more lines of the ASCII art");
+    let buildtstamp = option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or("unknown");
+    let localtstamp =  {
+        if let Ok(dt_utc) = DateTime::parse_from_rfc3339(buildtstamp) {
+            dt_utc.with_timezone(&Local).to_string() }
+            else {
+                buildtstamp.to_string()
+            }
+        };
+
+//    info!("Built {}", option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or_default());
+      info!("Built {}", localtstamp);
+    
     
     let config = cfg::make_config(params);
 
