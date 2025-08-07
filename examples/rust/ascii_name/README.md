@@ -1,5 +1,6 @@
 # ASCII Name Experiment
 
+
 This experiment demonstrates the use of the feo (Fixed Execution Order) framework to print a name in ASCII art with a progressive display approach, where each activity adds one more line to the output.
 
 ## Features
