@@ -1,4 +1,4 @@
-// Copyright 2025 Accenture.
+// Copyright 2025 SCORE project
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,8 +25,8 @@ pub const COM_BACKEND: ComBackend = ComBackend::LinuxShm;
 pub const BIND_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8081);
 pub const BIND_ADDR2: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8082);
 
-// Default input string to generate ASCII art
-pub const DEFAULT_INPUT_STRING: &str = "Huhu";
+//  Input string to for FEO Ascii Art activities
+pub const DEFAULT_INPUT_STRING: &str = "ETAS";
 
 // Number of lines in ASCII art (each character is 7 lines tall)
 pub const NUM_LINES: usize = 7;
