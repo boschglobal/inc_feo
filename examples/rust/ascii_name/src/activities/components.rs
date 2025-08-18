@@ -44,6 +44,7 @@ where
 pub struct AsciiArtGenerator {
     activity_id: ActivityId,
     input_string: String,
+    buildtime: String,
     output: Box<dyn ActivityOutput<AsciiArt>>,
 }
 
@@ -56,6 +57,7 @@ impl AsciiArtGenerator {
         Box::new(Self {
             activity_id,
             input_string,
+            buildtime: option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or("unknown").to_string(),
             output: activity_output::<AsciiArt>(output_topic),
         })
     }
@@ -64,7 +66,7 @@ impl AsciiArtGenerator {
     fn generate_ascii_art(&self) -> Vec<String> {
         // Characters are 7 lines tall
         let mut result = vec![String::new(); 7];
-        
+        info!("Running build created {}", self.buildtime);
         for c in self.input_string.chars() {
             // Get ASCII art for this character
             let char_art = get_ascii_art_char(c);
@@ -165,12 +167,12 @@ impl Activity for AsciiArtPrinter {
         match self.input.read() {
             Ok(ascii_art_ref) => {
                 let ascii_art = ascii_art_ref.deref();
-                
+
                 // Print only this specific line
                 if self.line_index < ascii_art.lines.len() {
                     // Sleep for 100ms before printing
                     //std::thread::sleep(std::time::Duration::from_millis(100));
-                    info!("Activity {} printing line {}: {}", self.activity_id, self.line_index, ascii_art.lines[self.line_index]);
+                    info!("Activity {}: {}", self.activity_id, ascii_art.lines[self.line_index]);
                 }
                 
                 // Forward the ASCII art to the next activity if needed
