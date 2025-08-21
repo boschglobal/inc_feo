@@ -170,8 +170,8 @@ impl Activity for AsciiArtPrinter {
 
                 // Print only this specific line
                 if self.line_index < ascii_art.lines.len() {
-                    // Sleep for 100ms before printing
-                    //std::thread::sleep(std::time::Duration::from_millis(100));
+                    // Sleep for 300ms before printing
+                    std::thread::sleep(std::time::Duration::from_millis(300));
                     info!("Activity {}: {}", self.activity_id, ascii_art.lines[self.line_index]);
                 }
                 
