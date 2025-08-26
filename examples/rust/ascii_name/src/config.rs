@@ -26,7 +26,7 @@ pub const BIND_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST
 pub const BIND_ADDR2: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8082);
 
 // Default input string to generate ASCII art
-pub const DEFAULT_INPUT_STRING: &str = "Turbo-B";
+pub const DEFAULT_INPUT_STRING: &str = "Best Demo!</br>";
 
 // Number of lines in ASCII art (each character is 7 lines tall)
 pub const NUM_LINES: usize = 7;
