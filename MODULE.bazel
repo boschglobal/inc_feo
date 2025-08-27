@@ -35,6 +35,7 @@ crate.from_cargo(
         "//:Cargo.toml",
         "//:examples/rust/cycle-benchmark/Cargo.toml",
         "//:examples/rust/mini-adas/Cargo.toml",
+        "//:examples/rust/ascii_name/Cargo.toml",
         "//:feo/Cargo.toml",
         "//:feo-com/Cargo.toml",
         "//:feo-cpp-build/Cargo.toml",
