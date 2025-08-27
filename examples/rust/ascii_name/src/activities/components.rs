@@ -1,9 +1,9 @@
-// Copyright 2025 Accenture.
+// Copyright 2025 SCORE project.
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::activities::ascii_art_big::get_ascii_art_char;
 use crate::activities::messages::AsciiArt;
-use crate::activities::ascii_art::get_ascii_art_char;
 use core::ops::Deref;
 use feo::activity::Activity;
 use feo::ids::ActivityId;
@@ -57,20 +57,22 @@ impl AsciiArtGenerator {
         Box::new(Self {
             activity_id,
             input_string,
-            buildtime: option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or("unknown").to_string(),
+            buildtime: option_env!("VERGEN_BUILD_TIMESTAMP")
+                .unwrap_or("unknown")
+                .to_string(),
             output: activity_output::<AsciiArt>(output_topic),
         })
     }
-    
+
     /// Generate ASCII art based on the input string
     fn generate_ascii_art(&self) -> Vec<String> {
-        // Characters are 7 lines tall
-        let mut result = vec![String::new(); 7];
+        // Characters are 8 lines tall (big.flf font)
+        let mut result = vec![String::new(); 8];
         info!("Running build created {}", self.buildtime);
         for c in self.input_string.chars() {
             // Get ASCII art for this character
             let char_art = get_ascii_art_char(c);
-            
+
             // Append each line to the result
             for (i, line) in char_art.iter().enumerate() {
                 if i < result.len() {
@@ -78,7 +80,7 @@ impl AsciiArtGenerator {
                 }
             }
         }
-        
+
         result
     }
 }
@@ -89,12 +91,15 @@ impl Activity for AsciiArtGenerator {
     }
 
     fn startup(&mut self) {
-        debug!("Starting AsciiArtGenerator for string: {}", self.input_string);
+        debug!(
+            "Starting AsciiArtGenerator for string: {}",
+            self.input_string
+        );
     }
 
     fn step(&mut self) {
         debug!("Generating ASCII art for: {}", self.input_string);
-        
+
         // Create ASCII art message
         let ascii_art = AsciiArt {
             lines: self.generate_ascii_art(),
@@ -127,7 +132,7 @@ impl Activity for AsciiArtGenerator {
 #[derive(Debug)]
 pub struct AsciiArtPrinter {
     activity_id: ActivityId,
-    line_index: usize,  // The specific line to print (just this one line)
+    line_index: usize, // The specific line to print (just this one line)
     input: Box<dyn ActivityInput<AsciiArt>>,
     output: Option<Box<dyn ActivityOutput<AsciiArt>>>,
 }
@@ -139,8 +144,8 @@ impl AsciiArtPrinter {
         input_topic: &str,
         output_topic: Option<&str>,
     ) -> Box<dyn Activity> {
-        let output = output_topic.map(|topic| activity_output::<AsciiArt>(topic));
-        
+        let output = output_topic.map(activity_output::<AsciiArt>);
+
         Box::new(Self {
             activity_id,
             line_index,
@@ -162,7 +167,7 @@ impl Activity for AsciiArtPrinter {
 
     fn step(&mut self) {
         debug!("Processing ASCII art for line {}", self.line_index);
-        
+
         // Read the ASCII art from previous activity
         match self.input.read() {
             Ok(ascii_art_ref) => {
@@ -171,10 +176,13 @@ impl Activity for AsciiArtPrinter {
                 // Print only this specific line
                 if self.line_index < ascii_art.lines.len() {
                     // Sleep for 300ms before printing
-                    std::thread::sleep(std::time::Duration::from_millis(300));
-                    info!("Activity {}: {}", self.activity_id, ascii_art.lines[self.line_index]);
+                    std::thread::sleep(core::time::Duration::from_millis(300));
+                    info!(
+                        "FEO {}: {}",
+                        self.activity_id, ascii_art.lines[self.line_index]
+                    );
                 }
-                
+
                 // Forward the ASCII art to the next activity if needed
                 if let Some(ref mut output) = self.output {
                     match output.write_uninit() {

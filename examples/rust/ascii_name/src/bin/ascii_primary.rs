@@ -2,17 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use ascii_name::config::{
+    agent_assignments_ids, topic_dependencies, COM_BACKEND, MAX_ADDITIONAL_SUBSCRIBERS, NUM_LINES,
+};
+use chrono::{DateTime, Local};
 use feo::agent::com_init::initialize_com_primary;
 use feo::ids::AgentId;
 use feo_log::{info, LevelFilter};
 use feo_time::Duration;
-use ascii_name::config::{
-    agent_assignments_ids, topic_dependencies, COM_BACKEND, MAX_ADDITIONAL_SUBSCRIBERS,
-    NUM_LINES
-};
 use std::collections::HashSet;
-use chrono::{DateTime, Local};
-
 
 const AGENT_ID: AgentId = AgentId::new(100);
 // Long cycle time (10 seconds) so that the ASCII art is visible for some time
@@ -24,21 +22,23 @@ fn main() {
     let params = Params::from_args();
 
     info!("Starting ASCII Name display with {} lines", NUM_LINES);
-    info!("The ASCII art will refresh every {} seconds", params.feo_cycle_time.as_secs());
+    info!(
+        "The ASCII art will refresh every {} seconds",
+        params.feo_cycle_time.as_secs()
+    );
     info!("Each activity will print progressively more lines of the ASCII art");
     let buildtstamp = option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or("unknown");
-    let localtstamp =  {
+    let localtstamp = {
         if let Ok(dt_utc) = DateTime::parse_from_rfc3339(buildtstamp) {
-            dt_utc.with_timezone(&Local).to_string() }
-            else {
-                buildtstamp.to_string()
-            }
-        };
+            dt_utc.with_timezone(&Local).to_string()
+        } else {
+            buildtstamp.to_string()
+        }
+    };
 
-//    info!("Built {}", option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or_default());
-      info!("Built {}", localtstamp);
-    
-    
+    //    info!("Built {}", option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or_default());
+    info!("Built {}", localtstamp);
+
     let config = cfg::make_config(params);
 
     // Initialize topics. Do not drop.
@@ -117,9 +117,9 @@ mod cfg {
 #[cfg(feature = "signalling_direct_tcp")]
 mod cfg {
     use super::{check_ids, Duration, Params, AGENT_ID};
+    use ascii_name::config::{activity_dependencies, agent_workerpool_assignments, BIND_ADDR};
     use feo::agent::NodeAddress;
     use feo::ids::AgentId;
-    use ascii_name::config::{activity_dependencies, agent_workerpool_assignments, BIND_ADDR};
     use std::collections::HashSet;
 
     pub(super) use feo::agent::direct::primary::{Primary, PrimaryConfig};
@@ -142,9 +142,9 @@ mod cfg {
 #[cfg(feature = "signalling_direct_unix")]
 mod cfg {
     use super::{check_ids, Duration, Params, AGENT_ID};
+    use ascii_name::config::{activity_dependencies, agent_workerpool_assignments, socket_paths};
     use feo::agent::NodeAddress;
     use feo::ids::AgentId;
-    use ascii_name::config::{activity_dependencies, agent_workerpool_assignments, socket_paths};
     use std::collections::HashSet;
 
     pub(super) use feo::agent::direct::primary::{Primary, PrimaryConfig};
@@ -167,11 +167,12 @@ mod cfg {
 #[cfg(feature = "signalling_relayed_tcp")]
 mod cfg {
     use super::{check_ids, Duration, Params, AGENT_ID};
+    use ascii_name::config::{
+        activity_dependencies, agent_workerpool_assignments, worker_agent_map, BIND_ADDR,
+        BIND_ADDR2,
+    };
     use feo::agent::NodeAddress;
     use feo::ids::{ActivityId, AgentId, WorkerId};
-    use ascii_name::config::{
-        activity_dependencies, agent_workerpool_assignments, worker_agent_map, BIND_ADDR, BIND_ADDR2,
-    };
     use std::collections::{HashMap, HashSet};
 
     pub(super) use feo::agent::relayed::primary::{Primary, PrimaryConfig};
@@ -206,11 +207,11 @@ mod cfg {
 #[cfg(feature = "signalling_relayed_unix")]
 mod cfg {
     use super::{check_ids, Duration, Params, AGENT_ID};
-    use feo::agent::NodeAddress;
-    use feo::ids::{ActivityId, AgentId, WorkerId};
     use ascii_name::config::{
         activity_dependencies, agent_workerpool_assignments, socket_paths, worker_agent_map,
     };
+    use feo::agent::NodeAddress;
+    use feo::ids::{ActivityId, AgentId, WorkerId};
     use std::collections::{HashMap, HashSet};
 
     pub(super) use feo::agent::relayed::primary::{Primary, PrimaryConfig};
