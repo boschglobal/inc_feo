@@ -26,7 +26,7 @@ pub const BIND_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST
 pub const BIND_ADDR2: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8082);
 
 //  Input string to for FEO Ascii Art activities
-pub const DEFAULT_INPUT_STRING: &str = "ETAS 2025 Rulez";
+pub const DEFAULT_INPUT_STRING: &str = "ETAS 2025 S-CORE";
 
 // Number of lines in ASCII art (each character is 8 lines tall for big.flf font)
 pub const NUM_LINES: usize = 8;
