@@ -27,7 +27,7 @@ pub const BIND_ADDR2: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOS
 
 //  Input string to for FEO Ascii Art activities
 
-pub const DEFAULT_INPUT_STRING: &str = "S-CORE IAA";
+pub const DEFAULT_INPUT_STRING: &str = "S-CORE IAA RR";
 // Number of lines in ASCII art (each character is 8 lines tall for big.flf font)
 pub const NUM_LINES: usize = 8;
 
