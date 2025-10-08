@@ -4,6 +4,7 @@
 
 use crate::activities::ascii_art_big::get_ascii_art_char;
 use crate::activities::messages::AsciiArt;
+use crate::activities::servohelper::ServoHelper;
 use core::ops::Deref;
 use feo::activity::Activity;
 use feo::ids::ActivityId;
@@ -14,6 +15,12 @@ use feo_com::iox2::{Iox2Input, Iox2Output};
 use feo_com::linux_shm::{LinuxShmInput, LinuxShmOutput};
 use feo_log::{debug, info};
 use std::fmt;
+use std::sync::Arc;
+
+/// Create a shared ServoHelper instance that can be used across multiple activities
+pub fn create_shared_servo_helper() -> std::io::Result<Arc<ServoHelper>> {
+    Ok(Arc::new(ServoHelper::new()?))
+}
 
 /// Create an activity output.
 fn activity_output<T>(topic: &str) -> Box<dyn ActivityOutput<T>>
@@ -61,7 +68,7 @@ impl AsciiArtGenerator {
                 .unwrap_or("unknown")
                 .to_string(),
             output: activity_output::<AsciiArt>(output_topic),
-        })
+        }) 
     }
 
     /// Generate ASCII art based on the input string
@@ -69,6 +76,7 @@ impl AsciiArtGenerator {
         // Characters are 8 lines tall (big.flf font)
         let mut result = vec![String::new(); 8];
         info!("Running build created {}", self.buildtime);
+        //
         for c in self.input_string.chars() {
             // Get ASCII art for this character
             let char_art = get_ascii_art_char(c);
@@ -80,7 +88,6 @@ impl AsciiArtGenerator {
                 }
             }
         }
-
         result
     }
 }
@@ -135,6 +142,7 @@ pub struct AsciiArtPrinter {
     line_index: usize, // The specific line to print (just this one line)
     input: Box<dyn ActivityInput<AsciiArt>>,
     output: Option<Box<dyn ActivityOutput<AsciiArt>>>,
+    servo_helper: Arc<ServoHelper>,
 }
 
 impl AsciiArtPrinter {
@@ -143,6 +151,7 @@ impl AsciiArtPrinter {
         line_index: usize,
         input_topic: &str,
         output_topic: Option<&str>,
+        servo_helper: Arc<ServoHelper>,
     ) -> Box<dyn Activity> {
         let output = output_topic.map(activity_output::<AsciiArt>);
 
@@ -151,6 +160,7 @@ impl AsciiArtPrinter {
             line_index,
             input: activity_input::<AsciiArt>(input_topic),
             output,
+            servo_helper,
         })
     }
 }
@@ -167,6 +177,9 @@ impl Activity for AsciiArtPrinter {
 
     fn step(&mut self) {
         debug!("Processing ASCII art for line {}", self.line_index);
+        self.servo_helper.send_command((self.line_index as u8)*36).unwrap_or_else(|e| {
+            debug!("Error sending command to ServoHelper: {:?}", e);
+        });
 
         // Read the ASCII art from previous activity
         match self.input.read() {

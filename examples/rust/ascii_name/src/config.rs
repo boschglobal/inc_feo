@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::activities::components::{AsciiArtGenerator, AsciiArtPrinter};
+use crate::activities::components::{AsciiArtGenerator, AsciiArtPrinter, create_shared_servo_helper};
 use crate::activities::messages::AsciiArt;
 use core::net::{IpAddr, Ipv4Addr, SocketAddr};
 use feo::activity::{ActivityBuilder, ActivityIdAndBuilder};
@@ -11,6 +11,7 @@ use feo::topicspec::{Direction, TopicSpecification};
 use feo_com::interface::ComBackend;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 pub type WorkerAssignment = (WorkerId, Vec<(ActivityId, Box<dyn ActivityBuilder>)>);
 
@@ -55,6 +56,9 @@ pub fn socket_paths() -> (PathBuf, PathBuf) {
 
 pub fn agent_workerpool_assignments() -> HashMap<AgentId, Vec<(WorkerId, Vec<ActivityIdAndBuilder>)>>
 {
+    // Create shared servo helper for all activities
+    let servo_helper = create_shared_servo_helper().expect("Failed to create shared servo helper");
+
     // Create all activities
     let mut activities = Vec::new();
 
@@ -63,7 +67,7 @@ pub fn agent_workerpool_assignments() -> HashMap<AgentId, Vec<(WorkerId, Vec<Act
 
     // Add printer activities (one for each line of ASCII art)
     for i in 0..NUM_LINES {
-        activities.push(create_ascii_art_printer_activity(i));
+        activities.push(create_ascii_art_printer_activity(i, servo_helper.clone()));
     }
 
     let ascii_art_activity_to_worker_assignment =
@@ -222,7 +226,7 @@ fn create_ascii_art_generator_activity() -> (ActivityId, Box<dyn ActivityBuilder
 }
 
 /// Helper function to create an ASCII art printer activity
-fn create_ascii_art_printer_activity(line_index: usize) -> (ActivityId, Box<dyn ActivityBuilder>) {
+fn create_ascii_art_printer_activity(line_index: usize, servo_helper: Arc<crate::activities::servohelper::ServoHelper>) -> (ActivityId, Box<dyn ActivityBuilder>) {
     let activity_id = ActivityId::new((line_index + 1) as u64); // +1 because 0 is the generator
 
     // Input topic comes from previous activity
@@ -252,7 +256,7 @@ fn create_ascii_art_printer_activity(line_index: usize) -> (ActivityId, Box<dyn 
     create_activity(
         activity_id,
         Box::new(move |id| {
-            AsciiArtPrinter::build(id, line_index, &input_topic, output_topic.as_deref())
+            AsciiArtPrinter::build(id, line_index, &input_topic, output_topic.as_deref(), servo_helper.clone())
         }),
     )
 }
